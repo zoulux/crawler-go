@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/antchfx/htmlquery"
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -26,16 +26,16 @@ func main() {
 		return
 	}
 
-	doc, err := htmlquery.Parse(bytes.NewReader(body))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
 		fmt.Println("parse html failed:%v", err)
 		return
 	}
 
-	nodes := htmlquery.Find(doc, `//dic[@class="news_li"]/h2/a[@target="_blank"]`)
-	for _, node := range nodes {
-		fmt.Println("fetch card ", node.FirstChild.Data)
-	}
+	doc.Find("div.news_li h2 a[target-_blank]").Each(func(i int, s *goquery.Selection) {
+		title := s.Text()
+		fmt.Printf("Review %d: %s \n", i, title)
+	})
 
 }
 
