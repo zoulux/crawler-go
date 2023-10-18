@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
@@ -12,8 +13,10 @@ import (
 	"golang.org/x/text/transform"
 )
 
+var headerRe = regexp.MustCompile(`<div class="news_li"[\s\S]*?<h2>[\s\S]*?<a.*?target="_blank">([\s\S]*?)</a>`)
+
 func main() {
-	url := "https://www.chinanews.com.cn/"
+	url := "https://www.thepaper.cn/"
 	body, err := Fetch(url)
 
 	if err != nil {
@@ -21,8 +24,10 @@ func main() {
 		return
 	}
 
-	fmt.Println(string(body))
-
+	matches := headerRe.FindAllSubmatch(body, -1)
+	for _, m := range matches {
+		fmt.Println("fetch card news:", string(m[1]))
+	}
 }
 
 func Fetch(url string) ([]byte, error) {
