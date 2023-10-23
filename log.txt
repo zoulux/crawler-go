@@ -1,0 +1,2 @@
+{"level":"INFO","ts":"2023-10-23T22:09:07.320+0800","caller":"crawler-go/main.go:19","msg":"log init end"}
+{"level":"INFO","ts":"2023-10-23T22:09:17.888+0800","caller":"crawler-go/main.go:19","msg":"log init end"}

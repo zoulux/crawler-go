@@ -6,12 +6,17 @@ import (
 	"time"
 
 	"github.com/zoulux/crawler-go/collect"
+	"github.com/zoulux/crawler-go/log"
 	"github.com/zoulux/crawler-go/proxy"
 )
 
 var headerRe = regexp.MustCompile(`<div class="news_li"[\s\S]*?<h2>[\s\S]*?<a.*?target="_blank">([\s\S]*?)</a>`)
 
 func main() {
+	plugin, c := log.NewFilePlugin("./log.txt", log.InfoLevel)
+	defer c.Close()
+	logger := log.NewLogger(plugin)
+	logger.Info("log init end")
 
 	proxyURLs := []string{"http://127.0.0.1:8088"}
 
