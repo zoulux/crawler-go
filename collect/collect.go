@@ -16,14 +16,14 @@ import (
 )
 
 type Fetcher interface {
-	Get(url string) ([]byte, error)
+	Get(req *Request) ([]byte, error)
 }
 
 type BaseFetch struct {
 }
 
-func (b BaseFetch) Get(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+func (b BaseFetch) Get(req *Request) ([]byte, error) {
+	resp, err := http.Get(req.Url)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -57,7 +57,7 @@ type BrowserFetch struct {
 	Proxy   proxy.ProxyFunc
 }
 
-func (b BrowserFetch) Get(url string) ([]byte, error) {
+func (b BrowserFetch) Get(request *Request) ([]byte, error) {
 	client := &http.Client{
 		Timeout: b.Timeout,
 	}
@@ -68,7 +68,10 @@ func (b BrowserFetch) Get(url string) ([]byte, error) {
 		client.Transport = transport
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, request.Url, nil)
+	if len(request.Cookie) != 0 {
+		req.Header.Set("Cookie", request.Cookie)
+	}
 	if err != nil {
 		return nil, fmt.Errorf(`HTTP GET error: %v`, err)
 	}
