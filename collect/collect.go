@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.uber.org/zap"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/unicode"
@@ -55,6 +56,7 @@ func DeterminEncoding(r *bufio.Reader) encoding.Encoding {
 type BrowserFetch struct {
 	Timeout time.Duration
 	Proxy   proxy.ProxyFunc
+	Logger  *zap.Logger
 }
 
 func (b BrowserFetch) Get(request *Request) ([]byte, error) {
