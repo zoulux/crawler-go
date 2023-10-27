@@ -19,14 +19,16 @@ func main() {
 	logger := log.NewLogger(plugin)
 	logger.Info("log init end")
 
-	var seeds []*collect.Request
+	var seeds []*collect.Task
 	for i := 25; i <= 100; i += 25 {
 		str := fmt.Sprintf("https://www.douban.com/group/szsh/discussion?start=%d", i)
-		seeds = append(seeds, &collect.Request{
+		seeds = append(seeds, &collect.Task{
 			Url:      str,
 			WaitTime: 1 * time.Second,
-			// Cookie:    "",
-			ParseFunc: doubangroup.ParseURL,
+			MaxDepth: 5,
+			RootReq: &collect.Request{
+				ParseFunc: doubangroup.ParseURL,
+			},
 		})
 	}
 	var f collect.Fetcher = collect.BrowserFetch{

@@ -71,8 +71,8 @@ func (b BrowserFetch) Get(request *Request) ([]byte, error) {
 	}
 
 	req, err := http.NewRequest(http.MethodGet, request.Url, nil)
-	if len(request.Cookie) != 0 {
-		req.Header.Set("Cookie", request.Cookie)
+	if len(request.Task.Cookie) != 0 {
+		req.Header.Set("Cookie", request.Task.Cookie)
 	}
 	if err != nil {
 		return nil, fmt.Errorf(`HTTP GET error: %v`, err)

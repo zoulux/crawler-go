@@ -28,7 +28,14 @@ func (s *Schedule) Run() {
 }
 
 func (s *Schedule) Schedule() {
-	var reqQueue = s.Seeds
+	var reqQueue []*collect.Request
+
+	for _, seed := range s.Seeds {
+		seed.RootReq.Task = seed
+		seed.RootReq.Url = seed.Url
+		reqQueue = append(reqQueue, seed.RootReq)
+	}
+
 	go func() {
 		for {
 			var req *collect.Request
@@ -53,6 +60,10 @@ func (s *Schedule) CreateWork() {
 
 	for {
 		r := <-s.workCh
+		if err := r.Check(); err != nil {
+			continue
+		}
+
 		body, err := s.Fetcher.Get(r)
 		if err != nil {
 			s.Logger.Error("can't fetch", zap.Error(err))
