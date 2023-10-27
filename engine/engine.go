@@ -6,17 +6,14 @@ import (
 	"github.com/zoulux/crawler-go/collect"
 )
 
-type ScheduleEngine struct {
+type Schedule struct {
 	requestCh chan *collect.Request
 	workCh    chan *collect.Request
 	out       chan collect.ParseResult
-	WorkCount int
-	Logger    *zap.Logger
-	Fetcher   collect.Fetcher
-	Seeds     []*collect.Request
+	options
 }
 
-func (s *ScheduleEngine) Run() {
+func (s *Schedule) Run() {
 	requestCh := make(chan *collect.Request)
 	workCh := make(chan *collect.Request)
 	out := make(chan collect.ParseResult)
@@ -30,7 +27,7 @@ func (s *ScheduleEngine) Run() {
 	s.HandleResult()
 }
 
-func (s *ScheduleEngine) Schedule() {
+func (s *Schedule) Schedule() {
 	var reqQueue = s.Seeds
 	go func() {
 		for {
@@ -52,7 +49,7 @@ func (s *ScheduleEngine) Schedule() {
 	}()
 }
 
-func (s *ScheduleEngine) CreateWork() {
+func (s *Schedule) CreateWork() {
 
 	for {
 		r := <-s.workCh
@@ -66,7 +63,7 @@ func (s *ScheduleEngine) CreateWork() {
 	}
 }
 
-func (s *ScheduleEngine) HandleResult() {
+func (s *Schedule) HandleResult() {
 	for {
 		select {
 		case result := <-s.out:
@@ -80,4 +77,15 @@ func (s *ScheduleEngine) HandleResult() {
 			}
 		}
 	}
+}
+
+func NewSchedule(opts ...Option) *Schedule {
+	options := defaultOptions
+
+	for _, opt := range opts {
+		opt(&options)
+	}
+	s := &Schedule{}
+	s.options = options
+	return s
 }
