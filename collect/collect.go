@@ -71,14 +71,15 @@ func (b BrowserFetch) Get(request *Request) ([]byte, error) {
 	}
 
 	req, err := http.NewRequest(http.MethodGet, request.Url, nil)
-	if len(request.Task.Cookie) != 0 {
-		req.Header.Set("Cookie", request.Task.Cookie)
-	}
 	if err != nil {
 		return nil, fmt.Errorf(`HTTP GET error: %v`, err)
 	}
+	if len(request.Task.Cookie) != 0 {
+		req.Header.Set("Cookie", request.Task.Cookie)
+	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36")
 	resp, err := client.Do(req)
+	time.Sleep(request.Task.WaitTime)
 	if err != nil {
 		return nil, fmt.Errorf(`HTTP GET resp error: %v`, err)
 	}

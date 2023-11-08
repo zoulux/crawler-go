@@ -15,6 +15,7 @@ type options struct {
 	Logger    *zap.Logger
 	Fetcher   collect.Fetcher
 	Seeds     []*collect.Task
+	scheduler Scheduler
 }
 
 type Option func(opts *options)
@@ -39,5 +40,11 @@ func WithWorkCount(workCount int) Option {
 func WithSeeds(seeds []*collect.Task) Option {
 	return func(opts *options) {
 		opts.Seeds = seeds
+	}
+}
+
+func WithScheduler(schedule Scheduler) Option {
+	return func(opts *options) {
+		opts.scheduler = schedule
 	}
 }

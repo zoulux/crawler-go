@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"regexp"
 	"time"
 
@@ -19,6 +20,11 @@ func main() {
 	logger := log.NewLogger(plugin)
 	logger.Info("log init end")
 
+	var f collect.Fetcher = collect.BrowserFetch{
+		Timeout: time.Second * 3000,
+		Logger:  logger,
+	}
+
 	var seeds []*collect.Task
 	for i := 25; i <= 100; i += 25 {
 		str := fmt.Sprintf("https://www.douban.com/group/szsh/discussion?start=%d", i)
@@ -26,20 +32,21 @@ func main() {
 			Url:      str,
 			WaitTime: 1 * time.Second,
 			MaxDepth: 5,
+			Fetcher:  f,
+			Cookie:   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36",
 			RootReq: &collect.Request{
+				Method:    http.MethodGet,
 				ParseFunc: doubangroup.ParseURL,
 			},
 		})
 	}
-	var f collect.Fetcher = collect.BrowserFetch{
-		Timeout: time.Second * 3000,
-		Logger:  logger,
-	}
-	s := engine.NewSchedule(
+
+	s := engine.NewEngine(
+		engine.WithFetcher(f),
 		engine.WithLogger(logger),
 		engine.WithWorkCount(5),
-		engine.WithFetcher(f),
 		engine.WithSeeds(seeds),
+		engine.WithScheduler(engine.NewSimpleScheduler()),
 	)
 
 	s.Run()
